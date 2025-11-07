@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رواد التغيير</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+body{
+  margin:0;
+  font-family:'Tajawal',sans-serif;
+  text-align:center;
+  background: linear-gradient(135deg,#007B83,#00BFA6,#0091EA);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:20px;
+}
+h1{font-size:50px;font-weight:900;margin-bottom:20px;text-shadow:0 4px 12px rgba(0,0,0,0.3);}
+.container{background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:30px;border-radius:25px;box-shadow:0 8px 25px rgba(0,0,0,0.2);width:400px;margin-bottom:20px;}
+input,select,button,textarea{width:100%;margin-top:10px;padding:10px;border-radius:10px;border:none;font-size:16px;text-align:center;}
+button{background:#fff;color:#007B83;font-weight:700;cursor:pointer;transition:0.3s;}
+button:hover{background:#00BFA6;color:#fff;transform:scale(1.05);}
+.timer{font-weight:bold;margin-bottom:15px;}
+.hidden{display:none;}
+textarea{resize:none;}
+#finalMsg{font-size:20px;font-weight:700;color:#FFD700;margin-bottom:20px;}
+footer{margin-top:20px;font-size:12px;}
+p{margin:8px 0;}
+</style>
+</head>
+<body>
+
+<!-- مقدمة الترحيب في الوسط -->
+<div class="container" id="welcomeBox">
+  <h1>أهلاً وسهلاً بكم في مسابقة رواد التغيير</h1>
+  <p>نرحب بكم نحن طلاب الصف السابع ونلتقي بكم في هذه المسابقة لخلق روح التنافس والإبداع بين جميع رواد مدرستنا الغالية حتى نرفع الاسم عالياً في سماء المجد ... نحن رواد مدارس المجد</p>
+  <p>تعريف بالمسابقة :<br>
+  ⏱️ الوقت: 40 ثانية فقط<br>
+  🧠 عدد الأسئلة: 3 أسئلة خفيفة ومسلّية<br>
+  🎁 الجوائز: التقط صورة الشاشة وارسل على الرقم المبين لك في الصفحة لتدخل السحب على جوائز جميلة 🎈</p>
+  <p>📣 جهّز نفسك، وابدأ المغامرة الآن!<br>
+  هل أنت من الأذكياء الذين سيصلون للنهاية؟ 💪</p>
+  <button onclick="startFromWelcome()">ابدأ الآن 🏁</button>
+</div>
+
+<div class="container hidden" id="startBox">
+  <label>الاسم الرباعي:</label>
+  <input type="text" id="nameInput" placeholder="أدخل اسمك الرباعي">
+  <label>الصف:</label>
+  <select id="gradeInput">
+    <option value="">اختر الصف</option>
+    <option>الصف الأول</option>
+    <option>الصف الثاني</option>
+    <option>الصف الثالث</option>
+    <option>الصف الرابع</option>
+    <option>الصف الخامس</option>
+    <option>الصف السادس</option>
+    <option>الصف السابع</option>
+    <option>الصف الثامن</option>
+  </select>
+  <button onclick="startQuiz()">ابدأ</button>
+  <p id="error" style="color:red;font-size:14px;display:none;">الرجاء إدخال الاسم الرباعي واختيار الصف.</p>
+</div>
+
+<div class="container hidden" id="quizBox">
+  <div class="timer" id="timer">الوقت المتبقي: 40 ثانية</div>
+  <div id="q1" class="question hidden">
+    <label>ما لقب الشاعر أحمد شوقي؟</label>
+    <input type="text" id="a1">
+    <button onclick="checkAnswer(1)">التالي</button>
+  </div>
+  <div id="q2" class="question hidden">
+    <label>ما الدولة التي تحد اليمن شمالًا؟</label>
+    <input type="text" id="a2">
+    <button onclick="checkAnswer(2)">التالي</button>
+  </div>
+  <div id="q3" class="question hidden">
+    <label>ما هي السورة التي تُسمى قلب القرآن؟</label>
+    <input type="text" id="a3">
+    <button onclick="finishQuiz()">إنهاء</button>
+  </div>
+  <p id="msg" style="color:red;"></p>
+</div>
+
+<div id="finalMsg"></div>
+
+<div class="container certificate hidden" id="certificate">
+  <h2>تهانينا! لقد أتممت مسابقة رواد التغيير بنجاح 🎉</h2>
+  <p id="certName"></p>
+  <p id="certClass"></p>
+  <p>رقم التواصل: 774257557</p>
+  <p id="certDate"></p>
+</div>
+
+<footer>الصف 7 | إعداد: علي حسين السقاف</footer>
+
+<script>
+let timerInterval,timeLeft=40;
+let nameInput, gradeInput;
+
+function normalize(str){
+  return str.replace(/[أإآا]/g,'ا')
+            .replace(/[ةه]/g,'ه')
+            .replace(/\s+/g,'')
+            .toLowerCase();
+}
+
+function startFromWelcome(){
+  document.getElementById('welcomeBox').classList.add('hidden');
+  document.getElementById('startBox').classList.remove('hidden');
+}
+
+function startQuiz(){
+  nameInput=document.getElementById('nameInput').value.trim();
+  gradeInput=document.getElementById('gradeInput').value;
+  const error=document.getElementById('error');
+  if(nameInput.split(' ').length<4 || !gradeInput){error.style.display='block';return;}
+  error.style.display='none';
+  if(localStorage.getItem('done_'+nameInput)){alert('هذا الاسم استخدم مسبقًا، لا يمكنك إعادة المحاولة');return;}
+  document.getElementById('startBox').classList.add('hidden');
+  document.getElementById('quizBox').classList.remove('hidden');
+  document.getElementById('q1').classList.remove('hidden');
+  startTimer();
+}
+
+function startTimer(){
+  timeLeft=40;
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timer').innerText='الوقت المتبقي: '+timeLeft+' ثانية';
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      localStorage.setItem('done_'+nameInput,'1');
+      alert('انتهى الوقت! لا يمكنك إعادة المحاولة.');
+      location.reload();
+    }
+  },1000);
+}
+
+function checkAnswer(num){
+  const msg=document.getElementById('msg');
+  msg.textContent='';
+  let ans=document.getElementById('a'+num).value.trim();
+  if(!ans){msg.textContent='الرجاء إدخال الإجابة'; return;}
+  let nAns=normalize(ans);
+  let correct=false;
+
+  if(num===1 && nAns.includes('اميرالشعراء')) correct=true;
+
+  if(num===2){
+    const valid2 = ['السعودية','السعوديه','المملكةالسعودية','المملكةالعربيهالسعوديه','المملكةالعربيةالسعوديه',
+                    'المملكهالسعودية','المملكهالعربيهالسعوديه','المملكهالعربيةالسعوديه','مملكه','المملكة'];
+    for(let v of valid2){
+      if(nAns.includes(normalize(v))){correct=true; break;}
+    }
+  }
+
+  if(num===3 && (nAns==='يس'||nAns==='ياسين'||nAns==='سورهيس'||nAns==='سورهياسين')) correct=true;
+
+  if(!correct){msg.textContent='الإجابة غير صحيحة، حاول مرة أخرى';return;}
+  document.getElementById('q'+num).classList.add('hidden');
+  if(num<3) document.getElementById('q'+(num+1)).classList.remove('hidden');
+}
+
+function finishQuiz(){
+  let ans=document.getElementById('a3').value.trim();
+  let nAns=normalize(ans);
+  const msg=document.getElementById('msg');
+  msg.textContent='';
+  if(!(nAns==='يس'||nAns==='ياسين'||nAns==='سورهيس'||nAns==='سورهياسين')){msg.textContent='الإجابة غير صحيحة، حاول مرة أخرى';return;}
+  clearInterval(timerInterval);
+  localStorage.setItem('done_'+nameInput,'1');
+  document.getElementById('quizBox').classList.add('hidden');
+  document.getElementById('finalMsg').innerText='قص الشاشة لتدخل السحب';
+  const cert=document.getElementById('certificate');
+  document.getElementById('certName').innerText='الاسم: '+nameInput;
+  document.getElementById('certClass').innerText='الصف: '+gradeInput;
+  document.getElementById('certDate').innerText='التاريخ: '+new Date().toLocaleDateString('ar-EG');
+  cert.classList.remove('hidden');
+}
+</script>
+
+</body>
+</html>
